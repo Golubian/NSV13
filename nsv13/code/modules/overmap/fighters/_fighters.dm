@@ -1406,6 +1406,45 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	. = ..()
 	ammo = list()
 
+/obj/item/fighter_component/secondary/mine_layer
+	name = "Fighter Mine Layer"
+	desc = "A module that lets fighters lay down mines during flight."
+	icon = 'nsv13/icons/obj/fighter_components.dmi'
+	icon_state = "minelayer"
+	accepted_ammo = /obj/item/ship_weapon/ammunition/mine
+	max_ammo = 12
+	fire_delay = 0.1
+
+
+
+/obj/item/fighter_component/secondary/mine_layer/load(obj/structure/overmap/target, atom/movable/AM)
+	if(!istype(AM, accepted_ammo))
+		return FALSE
+	if(ammo.len >= max_ammo)
+		return FALSE
+	AM.forceMove(src)
+	ammo += AM
+	playsound(target, 'nsv13/sound/effects/ship/mac_load.ogg', 100, 1)
+	return TRUE
+
+
+/obj/item/fighter_component/secondary/mine_layer/fire(obj/structure/overmap/target)
+	var/obj/structure/overmap/fighter/F = loc
+	if(!istype(F))
+		return FALSE
+	if(!ammo.len)
+		F.relay('sound/weapons/gun_dry_fire.ogg')
+		return FALSE
+	var/obj/item/ship_weapon/ammunition/mine = pick_n_take(ammo)
+	qdel(mine)
+	var/sound/chosen = pick('nsv13/sound/effects/ship/torpedo.ogg','nsv13/sound/effects/ship/freespace2/m_shrike.wav','nsv13/sound/effects/ship/freespace2/m_stiletto.wav','nsv13/sound/effects/ship/freespace2/m_tsunami.wav','nsv13/sound/effects/ship/freespace2/m_wasp.wav')
+	F.relay_to_nearby(chosen)
+	var/obj/item/deployable/mine/deployedmine = new(F.loc)
+	deployedmine.pixel_x = F.pixel_x
+	deployedmine.pixel_y = F.pixel_y
+	
+	return TRUE
+
 //Todo: make fighters use these.
 /obj/item/fighter_component/secondary/ordnance_launcher
 	name = "Fighter Missile Rack"

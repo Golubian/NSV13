@@ -145,6 +145,53 @@ Misc projectile types, effects, think of this as the special FX file.
 /obj/item/projectile/guided_munition/torpedo/dud
 	icon_state = "torpedo_dud"
 	damage = 0
+//NSV13 deployable space weapons
+/obj/item/deployable
+	icon = 'nsv13/icons/obj/munition_types.dmi'
+	var/impact_effect_type = /obj/effect/temp_visual/impact_effect/torpedo
+	var/damage = 0
+	var/faction = null 
+
+//NSV13 deployable space weapons
+/obj/item/deployable/proc/check_faction(atom/movable/A)
+	var/obj/structure/overmap/OM = A
+	if(!istype(OM))
+		return TRUE
+	if(faction != OM.faction)
+		return TRUE
+	return FALSE
+
+//NSV13 deployable space mines
+/obj/item/deployable/mine
+	icon_state = "mine_on"
+	name = "Standard mine"
+	desc = "A nasty mine."
+	damage = 150
+	obj_integrity = 10
+	max_integrity = 10
+	armor = list("overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 0)
+
+/obj/item/deployable/mine/Cross(obj/target)
+	. = ..()
+	
+	if(!check_faction(target))
+		target.take_damage(damage)
+		new impact_effect_type(src.loc, src.pixel_x, src.pixel_y)
+		qdel(src)
+		return TRUE
+
+	if(istype(target, /obj/structure/overmap)) //Were we to explode on an actual overmap, this would oneshot the ship as it's a powerful explosion.
+		target.take_damage(damage)
+		new impact_effect_type(src.loc, src.pixel_x, src.pixel_y)
+		qdel(src)
+		return TRUE
+
+	var/obj/item/projectile/P = target
+	if(isprojectile(P) && P.faction != faction) //Any non-friendly ammo hitting the mine will set it off.
+		new impact_effect_type(src.loc, src.pixel_x, src.pixel_y)
+		qdel(P)
+		qdel(src)
+		return TRUE
 
 /obj/item/projectile/guided_munition/Initialize()
 	. = ..()
