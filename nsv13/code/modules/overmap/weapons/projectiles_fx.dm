@@ -181,8 +181,8 @@ Misc projectile types, effects, think of this as the special FX file.
 /obj/item/deployable/mine/mini
 	icon_state = "mine_mini"
 	name = "Mini mine"
-	desc = "A nasty cluster mine."
-	damage = 50
+	desc = "A small mine."
+	damage = 45
 	obj_integrity = 10
 	max_integrity = 10
 	armor = list("overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 0)
@@ -191,29 +191,34 @@ Misc projectile types, effects, think of this as the special FX file.
 	. = ..()
 	sleep(15)
 	icon_state = "mine_cluster_open"
-	sleep(5)
+	sleep(1)
 	var/i
 	var/obj/item/deployable/mine/mini/mm
-	for(i=1, i<=10, i++)
+	var/xo
+	var/yo
+	for(i=1, i<=6, i++)
 		mm = new/obj/item/deployable/mine/mini()
 		mm.loc = src.loc
-		mm.pixel_x = src.pixel_x + rand(-50,50)
-		if(mm.pixel_x > 16)
-			mm.pixel_x -= 16
+		xo = src.pixel_x + rand(-50,50)
+		yo = src.pixel_y + rand(-50,50)
+		if(xo > 16)
+			mm.pixel_x = src.pixel_x - 16
+			xo -= 16
 			mm.forceMove(get_step(mm.loc,EAST))
-		else if(mm.pixel_x < -16)
-			mm.pixel_x += 16
+		else if(xo < -16)
+			mm.pixel_x = src.pixel_x + 16
 			mm.forceMove(get_step(mm.loc,WEST))
-
-		mm.pixel_y = src.pixel_y + rand(-50,50)
-		if(mm.pixel_y > 16)
-			mm.pixel_y -= 16
+			xo += 16
+		if(yo > 16)
+			mm.pixel_y = src.pixel_y - 16
+			yo -= 16
 			mm.forceMove(get_step(mm.loc,NORTH))
-		else if(mm.pixel_y < -16)
-			mm.pixel_y += 16
+		else if(yo < -16)
+			mm.pixel_y = src.pixel_y + 16
+			yo += 16
 			mm.forceMove(get_step(mm.loc,SOUTH))
+		animate(mm,pixel_x = xo, pixel_y = yo, time = 0.8)
 		sleep(1)
-			
 	qdel(src)
 
 /obj/item/deployable/mine/Cross(obj/target)
@@ -225,7 +230,7 @@ Misc projectile types, effects, think of this as the special FX file.
 		qdel(src)
 		return TRUE
 
-	if(istype(target, /obj/structure/overmap)) //Were we to explode on an actual overmap, this would oneshot the ship as it's a powerful explosion.
+	if(istype(target, /obj/structure/overmap))
 		target.take_damage(damage)
 		new impact_effect_type(src.loc, src.pixel_x, src.pixel_y)
 		qdel(src)

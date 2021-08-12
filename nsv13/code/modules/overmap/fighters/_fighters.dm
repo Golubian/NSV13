@@ -1412,8 +1412,8 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	icon = 'nsv13/icons/obj/fighter_components.dmi'
 	icon_state = "minelayer"
 	accepted_ammo = /obj/item/ship_weapon/ammunition/mine
-	max_ammo = 12
-	fire_delay = 0.1
+	max_ammo = 6
+	fire_delay = 0.5
 
 
 
@@ -1430,6 +1430,9 @@ Utility modules can be either one of these types, just ensure you set its slot t
 
 /obj/item/fighter_component/secondary/mine_layer/fire(obj/structure/overmap/target)
 	var/obj/structure/overmap/fighter/F = loc
+	if(is_station_level(F.z))
+		to_chat(F.pilot, "<span class='warning'>You can't lay mines so close to the ship!</span>")
+		return FALSE
 	if(!istype(F))
 		return FALSE
 	if(!ammo.len)
@@ -1441,10 +1444,10 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	qdel(mine)
 	var/sound/chosen = pick('nsv13/sound/effects/ship/torpedo.ogg','nsv13/sound/effects/ship/freespace2/m_shrike.wav','nsv13/sound/effects/ship/freespace2/m_stiletto.wav','nsv13/sound/effects/ship/freespace2/m_tsunami.wav','nsv13/sound/effects/ship/freespace2/m_wasp.wav')
 	F.relay_to_nearby(chosen)
-	var/obj/item/deployable/mine/deployedmine = new(proj_type)
-	deployedmine.loc = F.loc
+	var/obj/item/deployable/mine/deployedmine = new proj_type()
 	deployedmine.pixel_x = F.pixel_x - (sin(F.angle)*(F.bound_width/2 + 10))
 	deployedmine.pixel_y = F.pixel_y - (cos(F.angle)*(F.bound_height/2 + 10))
+	deployedmine.loc = F.loc
 	return TRUE
 
 //Todo: make fighters use these.
