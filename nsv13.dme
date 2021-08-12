@@ -3354,6 +3354,7 @@
 #include "nsv13\code\modules\munitions\ammunition\gauss_ammo.dm"
 #include "nsv13\code\modules\munitions\ammunition\pdc_ammo.dm"
 #include "nsv13\code\modules\munitions\ammunition\railgun_ammo.dm"
+#include "nsv13\code\modules\munitions\ammunition\mines\mine_types.dm"
 #include "nsv13\code\modules\munitions\ammunition\missiles\missile_construction.dm"
 #include "nsv13\code\modules\munitions\ammunition\missiles\missile_parts.dm"
 #include "nsv13\code\modules\munitions\ammunition\missiles\missile_types.dm"

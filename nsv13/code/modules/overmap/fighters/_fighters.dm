@@ -1435,14 +1435,16 @@ Utility modules can be either one of these types, just ensure you set its slot t
 	if(!ammo.len)
 		F.relay('sound/weapons/gun_dry_fire.ogg')
 		return FALSE
+	var/proj_type = null //If this is true, we've got a launcher shipside that's been able to fire.
 	var/obj/item/ship_weapon/ammunition/mine = pick_n_take(ammo)
+	proj_type = mine.projectile_type
 	qdel(mine)
 	var/sound/chosen = pick('nsv13/sound/effects/ship/torpedo.ogg','nsv13/sound/effects/ship/freespace2/m_shrike.wav','nsv13/sound/effects/ship/freespace2/m_stiletto.wav','nsv13/sound/effects/ship/freespace2/m_tsunami.wav','nsv13/sound/effects/ship/freespace2/m_wasp.wav')
 	F.relay_to_nearby(chosen)
-	var/obj/item/deployable/mine/deployedmine = new(F.loc)
-	deployedmine.pixel_x = F.pixel_x
-	deployedmine.pixel_y = F.pixel_y
-	
+	var/obj/item/deployable/mine/deployedmine = new(proj_type)
+	deployedmine.loc = F.loc
+	deployedmine.pixel_x = F.pixel_x - (sin(F.angle)*(F.bound_width/2 + 10))
+	deployedmine.pixel_y = F.pixel_y - (cos(F.angle)*(F.bound_height/2 + 10))
 	return TRUE
 
 //Todo: make fighters use these.

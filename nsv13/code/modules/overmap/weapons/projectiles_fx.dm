@@ -145,14 +145,13 @@ Misc projectile types, effects, think of this as the special FX file.
 /obj/item/projectile/guided_munition/torpedo/dud
 	icon_state = "torpedo_dud"
 	damage = 0
-//NSV13 deployable space weapons
+
 /obj/item/deployable
-	icon = 'nsv13/icons/obj/munition_types.dmi'
+	icon = 'nsv13/icons/obj/munitions.dmi'
 	var/impact_effect_type = /obj/effect/temp_visual/impact_effect/torpedo
 	var/damage = 0
 	var/faction = null 
 
-//NSV13 deployable space weapons
 /obj/item/deployable/proc/check_faction(atom/movable/A)
 	var/obj/structure/overmap/OM = A
 	if(!istype(OM))
@@ -161,15 +160,61 @@ Misc projectile types, effects, think of this as the special FX file.
 		return TRUE
 	return FALSE
 
-//NSV13 deployable space mines
 /obj/item/deployable/mine
-	icon_state = "mine_on"
+	icon_state = "mine_armed"
 	name = "Standard mine"
 	desc = "A nasty mine."
 	damage = 150
 	obj_integrity = 10
 	max_integrity = 10
 	armor = list("overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 0)
+
+/obj/item/deployable/mine/cluster
+	icon_state = "mine_cluster"
+	name = "Cluster mine"
+	desc = "A nasty cluster mine."
+	damage = 0
+	obj_integrity = 10
+	max_integrity = 10
+	armor = list("overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 0)
+
+/obj/item/deployable/mine/mini
+	icon_state = "mine_mini"
+	name = "Mini mine"
+	desc = "A nasty cluster mine."
+	damage = 50
+	obj_integrity = 10
+	max_integrity = 10
+	armor = list("overmap_light" = 10, "overmap_medium" = 5, "overmap_heavy" = 0)
+
+/obj/item/deployable/mine/cluster/Initialize()
+	. = ..()
+	sleep(15)
+	icon_state = "mine_cluster_open"
+	sleep(5)
+	var/i
+	var/obj/item/deployable/mine/mini/mm
+	for(i=1, i<=10, i++)
+		mm = new/obj/item/deployable/mine/mini()
+		mm.loc = src.loc
+		mm.pixel_x = src.pixel_x + rand(-50,50)
+		if(mm.pixel_x > 16)
+			mm.pixel_x -= 16
+			mm.forceMove(get_step(mm.loc,EAST))
+		else if(mm.pixel_x < -16)
+			mm.pixel_x += 16
+			mm.forceMove(get_step(mm.loc,WEST))
+
+		mm.pixel_y = src.pixel_y + rand(-50,50)
+		if(mm.pixel_y > 16)
+			mm.pixel_y -= 16
+			mm.forceMove(get_step(mm.loc,NORTH))
+		else if(mm.pixel_y < -16)
+			mm.pixel_y += 16
+			mm.forceMove(get_step(mm.loc,SOUTH))
+		sleep(1)
+			
+	qdel(src)
 
 /obj/item/deployable/mine/Cross(obj/target)
 	. = ..()
